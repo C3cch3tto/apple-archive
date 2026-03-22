@@ -155,6 +155,7 @@ const btnRemoveMaterial = document.getElementById('btn-remove-material');
 const btnRemoveCompatibility = document.getElementById('btn-remove-compatibility');
 const btnRemoveStrapStyle = document.getElementById('btn-remove-strapStyle');
 const btnRemoveAccessoryType = document.getElementById('btn-remove-accessoryType');
+const btnRemoveWatchSize = document.getElementById('btn-remove-watchSize');
 const btnExport = document.getElementById('btn-export');
 const btnImport = document.getElementById('btn-import');
 const importFile = document.getElementById('import-file');
@@ -272,6 +273,7 @@ function openCategory(catId) {
   populateMaterials(catId);
   populateCompatibilities(catId);
   populateStrapStyles(catId);
+  populateWatchSizes(catId);
 
   applyFamilyLogic(fFamily.value);
 
@@ -387,6 +389,27 @@ function populateStrapStyles(catId) {
   fStrap.appendChild(optNew);
 }
 
+function populateWatchSizes(catId) {
+  const fWatchSize = document.getElementById('f-watchSize');
+  if (!fWatchSize) return;
+  const btn = document.getElementById('btn-remove-watchSize');
+  if (btn) btn.disabled = true;
+  const list = COMPATIBILITIES[catId] || COMPATIBILITIES.default;
+  fWatchSize.innerHTML = '<option value="" disabled selected>Seleziona...</option>';
+  list.forEach(val => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = val + (val.toLowerCase().includes('mm') ? '' : ' mm');
+    fWatchSize.appendChild(opt);
+  });
+  const optNew = document.createElement('option');
+  optNew.value = '_new_';
+  optNew.textContent = '+ Aggiungi nuova...';
+  optNew.style.fontWeight = 'bold';
+  optNew.style.color = 'var(--accent)';
+  fWatchSize.appendChild(optNew);
+}
+
 function populateAccessoryTypes(family) {
   const fAcc = document.getElementById('f-accessoryType');
   if (!fAcc) return;
@@ -440,6 +463,7 @@ function applyFamilyLogic(family) {
   const fgCellular = document.getElementById('container-cellular');
   const fgCapacity = document.getElementById('container-capacity');
   const fgModel = document.getElementById('container-model');
+  const fgWatchSize = document.getElementById('container-watchSize');
 
   if (family === 'Cinturini') {
     if (fgModel) fgModel.style.display = 'none';
@@ -447,6 +471,7 @@ function applyFamilyLogic(family) {
     if (fgCellular) fgCellular.style.display = 'none';
     if (fgCapacity) fgCapacity.style.display = 'none';
     if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = false;
+    if (fgWatchSize) fgWatchSize.style.display = 'none';
 
     if (fDate) {
       fDate.type = 'number';
@@ -462,6 +487,7 @@ function applyFamilyLogic(family) {
     if (fgModel) fgModel.style.display = 'flex';
     if (fgCinturini1) fgCinturini1.style.display = 'none';
     if (fgCinturini2) fgCinturini2.style.display = 'none';
+    if (fgWatchSize) fgWatchSize.style.display = 'none';
 
     if (fgGeneration) fgGeneration.style.display = 'none';
     if (fgCellular) fgCellular.style.display = 'none';
@@ -494,7 +520,10 @@ function applyFamilyLogic(family) {
       if (fgGeneration) fgGeneration.style.display = 'block';
       if (fgCapacity) fgCapacity.style.display = 'block';
       if (fgCellular) fgCellular.style.display = 'block';
+      if (fgWatchSize) fgWatchSize.style.display = 'block';
       if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = true;
+    } else {
+      if (fgWatchSize) fgWatchSize.style.display = 'none';
     }
   }
 }
@@ -573,6 +602,10 @@ function renderProducts() {
               <div class="spec-item" style="${product.capacity || !['AirPods'].includes(product.macroCategory) ? '' : 'display: none;'}">
                   <span class="spec-label">Memoria</span>
                   <span class="spec-value">${product.capacity || '--'}</span>
+              </div>
+              <div class="spec-item" style="${(product.macroCategory === 'Watch' && product.family !== 'Cinturini' && product.watchSize) ? '' : 'display: none;'}">
+                  <span class="spec-label">Misura Cassa</span>
+                  <span class="spec-value">${product.watchSize} mm</span>
               </div>
               <div class="spec-item" style="${product.family === 'Cinturini' && product.strapStyle ? '' : 'display: none;'}">
                   <span class="spec-label">Stile</span>
@@ -669,6 +702,8 @@ window.editProduct = function (id, e) {
     if (fStrapStyle) fStrapStyle.value = prod.strapStyle || '';
     const fMaterial = document.getElementById('f-material');
     if (fMaterial) fMaterial.value = prod.material || '';
+    const fWatchSize = document.getElementById('f-watchSize');
+    if (fWatchSize) fWatchSize.value = prod.watchSize || '';
 
     applyFamilyLogic(prod.family);
 
@@ -807,6 +842,45 @@ if (fStrapStyleListener) {
         fStrapStyleListener.value = formatted;
       } else {
         fStrapStyleListener.value = '';
+      }
+    }
+  });
+}
+
+// NEW WATCH SIZE LOGIC
+const fWatchSizeListener = document.getElementById('f-watchSize');
+if (fWatchSizeListener) {
+  fWatchSizeListener.addEventListener('change', (e) => {
+    if (btnRemoveWatchSize) btnRemoveWatchSize.disabled = (!e.target.value || e.target.value === '_new_');
+    if (e.target.value === '_new_') {
+      const newVal = prompt('Inserisci la nuova misura cassa (es. "42"):');
+      if (newVal && newVal.trim() !== '') {
+        const formatted = newVal.trim();
+        if (!COMPATIBILITIES[activeCategory]) COMPATIBILITIES[activeCategory] = [...COMPATIBILITIES.default];
+        if (!COMPATIBILITIES[activeCategory].includes(formatted)) {
+          COMPATIBILITIES[activeCategory].push(formatted);
+          localStorage.setItem('apple-archive-compatibilities', JSON.stringify(COMPATIBILITIES));
+        }
+        populateWatchSizes(activeCategory);
+        fWatchSizeListener.value = formatted;
+      } else {
+        fWatchSizeListener.value = '';
+      }
+    }
+  });
+}
+
+if (btnRemoveWatchSize) {
+  btnRemoveWatchSize.addEventListener('click', () => {
+    const val = fWatchSizeListener.value;
+    if (!val || val === '_new_') return;
+    if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
+      if (COMPATIBILITIES[activeCategory] && COMPATIBILITIES[activeCategory].includes(val)) {
+        COMPATIBILITIES[activeCategory] = COMPATIBILITIES[activeCategory].filter(s => s !== val);
+        localStorage.setItem('apple-archive-compatibilities', JSON.stringify(COMPATIBILITIES));
+        populateWatchSizes(activeCategory);
+        fWatchSizeListener.value = '';
+        btnRemoveWatchSize.disabled = true;
       }
     }
   });
@@ -1044,7 +1118,8 @@ addForm.addEventListener('submit', (e) => {
     compatibility: document.getElementById('f-compatibility') ? document.getElementById('f-compatibility').value : '',
     strapStyle: document.getElementById('f-strapStyle') ? document.getElementById('f-strapStyle').value : '',
     material: document.getElementById('f-material') ? document.getElementById('f-material').value : '',
-    accessoryType: document.getElementById('f-accessoryType') ? document.getElementById('f-accessoryType').value : ''
+    accessoryType: document.getElementById('f-accessoryType') ? document.getElementById('f-accessoryType').value : '',
+    watchSize: document.getElementById('f-watchSize') ? document.getElementById('f-watchSize').value : ''
   };
 
   if (editingId) {
