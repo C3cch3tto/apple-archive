@@ -1,6 +1,6 @@
 // Macro Categories Configuration
 const DEFAULT_CATEGORIES = [
-  { id: 'Mac', icon: 'https://img.icons8.com/ios/100/mac-logo.png', title: 'Mac', sub: ['MacBook Air', 'MacBook Pro', 'iMac', 'Mac mini', 'Mac Studio', 'Mac Pro'] },
+  { id: 'Mac', icon: 'https://img.icons8.com/ios/100/mac-book-pro-m1.png', title: 'Mac', sub: ['MacBook Air', 'MacBook Pro', 'iMac', 'Mac mini', 'Mac Studio', 'Mac Pro'] },
   { id: 'iPad', icon: 'https://img.icons8.com/ios/100/ipad.png', title: 'iPad', sub: ['iPad Pro', 'iPad Air', 'iPad mini', 'iPad'] },
   { id: 'iPhone', icon: 'https://img.icons8.com/ios/100/iphone14-pro.png', title: 'iPhone', sub: ['iPhone Pro', 'iPhone Pro Max', 'iPhone Plus', 'iPhone', 'iPhone SE'] },
   { id: 'iPod', icon: 'https://img.icons8.com/ios/100/ipod-old.png', title: 'iPod', sub: ['iPod Classic', 'iPod Nano', 'iPod Touch', 'iPod Shuffle', 'iPod Mini'] },
@@ -77,19 +77,19 @@ if (!ACCESSORY_TYPES) {
 // Ensure Cinturini exists in Watch
 const watchCat = MACRO_CATEGORIES.find(c => c.id === 'Watch');
 if (watchCat && !watchCat.sub.includes('Cinturini')) {
-    watchCat.sub.push('Cinturini');
-    localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
+  watchCat.sub.push('Cinturini');
+  localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
 }
 
 // Update Accessories subcategories
 const accCat = MACRO_CATEGORIES.find(c => c.id === 'Accessories');
-if(accCat && !accCat.sub.includes('Accessori per Mac')) {
-   if(accCat.sub.includes('Magic Keyboard')) {
-       accCat.sub = ['Accessori per Mac', 'Accessori per iPad', 'Accessori per iPhone', 'Accessori per Apple Watch', 'Accessori per iPod', 'Accessori per Apple TV', 'HomeKit'];
-   } else {
-       accCat.sub.push('Accessori per Mac', 'Accessori per iPad', 'Accessori per iPhone', 'Accessori per Apple Watch', 'Accessori per iPod', 'Accessori per Apple TV', 'HomeKit');
-   }
-   localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
+if (accCat && !accCat.sub.includes('Accessori per Mac')) {
+  if (accCat.sub.includes('Magic Keyboard')) {
+    accCat.sub = ['Accessori per Mac', 'Accessori per iPad', 'Accessori per iPhone', 'Accessori per Apple Watch', 'Accessori per iPod', 'Accessori per Apple TV', 'HomeKit'];
+  } else {
+    accCat.sub.push('Accessori per Mac', 'Accessori per iPad', 'Accessori per iPhone', 'Accessori per Apple Watch', 'Accessori per iPod', 'Accessori per Apple TV', 'HomeKit');
+  }
+  localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
 }
 
 // Mock Initial Data (for the wow factor based on user's screenshots)
@@ -118,13 +118,13 @@ if (!products || products.length === 0) {
   // Migration: if macroCategory is missing on old data imported previously, fix it.
   let dirty = false;
   products = products.map(p => {
-     if(!p.macroCategory) { 
-        p.macroCategory = 'iPod'; 
-        dirty = true;
-     }
-     return p;
+    if (!p.macroCategory) {
+      p.macroCategory = 'iPod';
+      dirty = true;
+    }
+    return p;
   });
-  if(dirty) saveData();
+  if (dirty) saveData();
 }
 
 let activeCategory = null; // null = Home, otherwise Macro Category ID
@@ -179,20 +179,20 @@ function formatDateDisplay(dateString) {
 // RENDERING
 function renderCategories() {
   categoryGridEl.innerHTML = '';
-  
+
   MACRO_CATEGORIES.forEach(cat => {
     const totalItems = products.filter(p => p.macroCategory === cat.id).length;
-    
+
     const div = document.createElement('div');
     div.className = 'category-card fade';
     div.onclick = () => openCategory(cat.id);
-    
+
     div.innerHTML = `
       <div class="category-icon"><img src="${cat.icon}" alt="${cat.title}" class="category-icon-img"></div>
       <div class="category-title">${cat.title}</div>
       <div class="category-stats">${totalItems} dispositivi</div>
     `;
-    
+
     categoryGridEl.appendChild(div);
   });
 }
@@ -200,7 +200,7 @@ function renderCategories() {
 function openCategory(catId) {
   activeCategory = catId;
   const categoryConfig = MACRO_CATEGORIES.find(c => c.id === catId);
-  
+
   // UI State Switch
   pageTitle.textContent = categoryConfig.title;
   categoryGridEl.style.display = 'none';
@@ -209,11 +209,11 @@ function openCategory(catId) {
   btnAdd.style.display = 'flex';
   if (btnExport) btnExport.style.display = 'none';
   if (btnImport) btnImport.style.display = 'none';
-  
+
   // Setup the modal data dynamically
   fMacroCategory.value = catId;
   populateFamilies(catId);
-  
+
   // Dynamic Generation and Model Name Fields
   // Dynamic Generation and Model Name Fields
   const fGeneration = document.getElementById('f-generation');
@@ -226,38 +226,38 @@ function openCategory(catId) {
   const fgCapacity = document.getElementById('container-capacity');
   const fColor = document.getElementById('f-color');
 
-  if(fgCapacity) fgCapacity.style.display = 'block';
-  if(fCapacity) fCapacity.required = true;
+  if (fgCapacity) fgCapacity.style.display = 'block';
+  if (fCapacity) fCapacity.required = true;
 
   if (catId === 'iPod' || catId === 'TV' || catId === 'Watch') {
     fgGeneration.style.display = 'block';
     fgModelName.style.display = 'none';
     fModelName.value = '';
-    if(fgCellular) fgCellular.style.display = 'none';
-    if(fCellular) fCellular.value = 'No';
+    if (fgCellular) fgCellular.style.display = 'none';
+    if (fCellular) fCellular.value = 'No';
   } else if (catId === 'iPad') {
     fgGeneration.style.display = 'none';
     fGeneration.value = '';
     fgModelName.style.display = 'block';
-    if(fgCellular) fgCellular.style.display = 'block';
+    if (fgCellular) fgCellular.style.display = 'block';
   } else if (catId === 'AirPods') {
     fgGeneration.style.display = 'block';
     fgModelName.style.display = 'none';
     fModelName.value = '';
-    if(fgCellular) fgCellular.style.display = 'none';
-    if(fCellular) fCellular.value = 'No';
-    if(fgCapacity) fgCapacity.style.display = 'none';
-    if(fCapacity) {
-        fCapacity.required = false;
-        fCapacity.value = '';
+    if (fgCellular) fgCellular.style.display = 'none';
+    if (fCellular) fCellular.value = 'No';
+    if (fgCapacity) fgCapacity.style.display = 'none';
+    if (fCapacity) {
+      fCapacity.required = false;
+      fCapacity.value = '';
     }
-    if(fColor) fColor.value = '#ffffff';
+    if (fColor) fColor.value = '#ffffff';
   } else {
     fgGeneration.style.display = 'none';
     fGeneration.value = '';
     fgModelName.style.display = 'block';
-    if(fgCellular) fgCellular.style.display = 'none';
-    if(fCellular) fCellular.value = 'No';
+    if (fgCellular) fgCellular.style.display = 'none';
+    if (fCellular) fCellular.value = 'No';
   }
 
   // Dynamic Capacity Options
@@ -266,9 +266,9 @@ function openCategory(catId) {
   populateMaterials(catId);
   populateCompatibilities(catId);
   populateStrapStyles(catId);
-  
+
   applyFamilyLogic(fFamily.value);
-  
+
   renderProducts();
 }
 
@@ -281,14 +281,14 @@ function populateCapacities(catId) {
     const opt = document.createElement('option');
     opt.value = val;
     let displayVal = val.toUpperCase();
-    if(displayVal.includes('GB') && !displayVal.includes(' GB')) displayVal = displayVal.replace('GB', ' GB');
-    if(displayVal.includes('MB') && !displayVal.includes(' MB')) displayVal = displayVal.replace('MB', ' MB');
-    if(displayVal.includes('TB') && !displayVal.includes(' TB')) displayVal = displayVal.replace('TB', ' TB');
-    
+    if (displayVal.includes('GB') && !displayVal.includes(' GB')) displayVal = displayVal.replace('GB', ' GB');
+    if (displayVal.includes('MB') && !displayVal.includes(' MB')) displayVal = displayVal.replace('MB', ' MB');
+    if (displayVal.includes('TB') && !displayVal.includes(' TB')) displayVal = displayVal.replace('TB', ' TB');
+
     opt.textContent = displayVal;
     fCapacity.appendChild(opt);
   });
-  
+
   const optNew = document.createElement('option');
   optNew.value = '_new_';
   optNew.textContent = '+ Aggiungi nuovo taglio...';
@@ -299,8 +299,8 @@ function populateCapacities(catId) {
 
 function populateGenerations(catId) {
   const fGen = document.getElementById('f-generation');
-  if(!fGen) return;
-  if(btnRemoveGeneration) btnRemoveGeneration.disabled = true;
+  if (!fGen) return;
+  if (btnRemoveGeneration) btnRemoveGeneration.disabled = true;
   const genList = GENERATIONS[catId] || GENERATIONS.default;
   fGen.innerHTML = '<option value="" disabled selected>Seleziona o aggiungi...</option>';
   genList.forEach(val => {
@@ -309,7 +309,7 @@ function populateGenerations(catId) {
     opt.textContent = val;
     fGen.appendChild(opt);
   });
-  
+
   const optNew = document.createElement('option');
   optNew.value = '_new_';
   optNew.textContent = '+ Aggiungi nuova...';
@@ -320,9 +320,9 @@ function populateGenerations(catId) {
 
 function populateMaterials(catId) {
   const fMat = document.getElementById('f-material');
-  if(!fMat) return;
+  if (!fMat) return;
   const btn = document.getElementById('btn-remove-material');
-  if(btn) btn.disabled = true;
+  if (btn) btn.disabled = true;
   const list = MATERIALS[catId] || MATERIALS.default;
   fMat.innerHTML = '<option value="" disabled selected>Seleziona o aggiungi...</option>';
   list.forEach(val => {
@@ -341,9 +341,9 @@ function populateMaterials(catId) {
 
 function populateCompatibilities(catId) {
   const fComp = document.getElementById('f-compatibility');
-  if(!fComp) return;
+  if (!fComp) return;
   const btn = document.getElementById('btn-remove-compatibility');
-  if(btn) btn.disabled = true;
+  if (btn) btn.disabled = true;
   const list = COMPATIBILITIES[catId] || COMPATIBILITIES.default;
   fComp.innerHTML = '<option value="" disabled selected>Seleziona o aggiungi...</option>';
   list.forEach(val => {
@@ -362,9 +362,9 @@ function populateCompatibilities(catId) {
 
 function populateStrapStyles(catId) {
   const fStrap = document.getElementById('f-strapStyle');
-  if(!fStrap) return;
+  if (!fStrap) return;
   const btn = document.getElementById('btn-remove-strapStyle');
-  if(btn) btn.disabled = true;
+  if (btn) btn.disabled = true;
   const list = STRAP_STYLES[catId] || STRAP_STYLES.default;
   fStrap.innerHTML = '<option value="" disabled selected>Seleziona o aggiungi...</option>';
   list.forEach(val => {
@@ -383,9 +383,9 @@ function populateStrapStyles(catId) {
 
 function populateAccessoryTypes(family) {
   const fAcc = document.getElementById('f-accessoryType');
-  if(!fAcc) return;
+  if (!fAcc) return;
   const btn = document.getElementById('btn-remove-accessoryType');
-  if(btn) btn.disabled = true;
+  if (btn) btn.disabled = true;
   const list = ACCESSORY_TYPES[family] || ACCESSORY_TYPES.default;
   fAcc.innerHTML = '<option value="" disabled selected>Seleziona o aggiungi...</option>';
   list.forEach(val => {
@@ -414,7 +414,7 @@ function populateFamilies(catId) {
       fFamily.appendChild(opt);
     });
   }
-  
+
   const optNewFam = document.createElement('option');
   optNewFam.value = '_new_';
   optNewFam.textContent = '+ Aggiungi nuovo modello...';
@@ -436,58 +436,58 @@ function applyFamilyLogic(family) {
   const fgModel = document.getElementById('container-model');
 
   if (family === 'Cinturini') {
-    if(fgModel) fgModel.style.display = 'none';
-    if(fgGeneration) fgGeneration.style.display = 'none';
-    if(fgCellular) fgCellular.style.display = 'none';
-    if(fgCapacity) fgCapacity.style.display = 'none';
-    if(document.getElementById('f-capacity')) document.getElementById('f-capacity').required = false;
-    
-    if(fDate) {
-        fDate.type = 'number';
-        fDate.placeholder = 'YYYY';
-        fDate.min = '2015';
-        fDate.max = new Date().getFullYear().toString();
+    if (fgModel) fgModel.style.display = 'none';
+    if (fgGeneration) fgGeneration.style.display = 'none';
+    if (fgCellular) fgCellular.style.display = 'none';
+    if (fgCapacity) fgCapacity.style.display = 'none';
+    if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = false;
+
+    if (fDate) {
+      fDate.type = 'number';
+      fDate.placeholder = 'YYYY';
+      fDate.min = '2015';
+      fDate.max = new Date().getFullYear().toString();
     }
-    if(fDateLabel) fDateLabel.textContent = 'Anno';
-    
-    if(fgCinturini1) fgCinturini1.style.display = 'flex';
-    if(fgCinturini2) fgCinturini2.style.display = 'flex';
+    if (fDateLabel) fDateLabel.textContent = 'Anno';
+
+    if (fgCinturini1) fgCinturini1.style.display = 'flex';
+    if (fgCinturini2) fgCinturini2.style.display = 'flex';
   } else if (activeCategory === 'Accessories') {
-    if(fgModel) fgModel.style.display = 'flex';
-    if(fgCinturini1) fgCinturini1.style.display = 'none';
-    if(fgCinturini2) fgCinturini2.style.display = 'none';
-    
-    if(fgGeneration) fgGeneration.style.display = 'none';
-    if(fgCellular) fgCellular.style.display = 'none';
-    if(fgCapacity) fgCapacity.style.display = 'none';
-    if(document.getElementById('f-capacity')) document.getElementById('f-capacity').required = false;
-    if(fgColorWrapper) fgColorWrapper.style.display = 'block';
-    
-    if(fDate) {
-        fDate.type = 'number';
-        fDate.placeholder = 'YYYY';
-        fDate.min = '1976';
-        fDate.max = new Date().getFullYear().toString();
+    if (fgModel) fgModel.style.display = 'flex';
+    if (fgCinturini1) fgCinturini1.style.display = 'none';
+    if (fgCinturini2) fgCinturini2.style.display = 'none';
+
+    if (fgGeneration) fgGeneration.style.display = 'none';
+    if (fgCellular) fgCellular.style.display = 'none';
+    if (fgCapacity) fgCapacity.style.display = 'none';
+    if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = false;
+    if (fgColorWrapper) fgColorWrapper.style.display = 'block';
+
+    if (fDate) {
+      fDate.type = 'number';
+      fDate.placeholder = 'YYYY';
+      fDate.min = '1976';
+      fDate.max = new Date().getFullYear().toString();
     }
-    if(fDateLabel) fDateLabel.textContent = 'Anno';
+    if (fDateLabel) fDateLabel.textContent = 'Anno';
   } else {
-    if(fgModel) fgModel.style.display = 'flex';
-    if(fgCinturini1) fgCinturini1.style.display = 'none';
-    if(fgCinturini2) fgCinturini2.style.display = 'none';
-    
-    if(fDate) {
-        fDate.type = 'date';
-        fDate.placeholder = '';
-        fDate.removeAttribute('min');
-        fDate.removeAttribute('max');
+    if (fgModel) fgModel.style.display = 'flex';
+    if (fgCinturini1) fgCinturini1.style.display = 'none';
+    if (fgCinturini2) fgCinturini2.style.display = 'none';
+
+    if (fDate) {
+      fDate.type = 'date';
+      fDate.placeholder = '';
+      fDate.removeAttribute('min');
+      fDate.removeAttribute('max');
     }
-    if(fDateLabel) fDateLabel.textContent = 'Data di uscita / Acquisto';
-    if(fgColorWrapper) fgColorWrapper.style.display = 'block';
-    
-    if(activeCategory === 'Watch') {
-        if(fgGeneration) fgGeneration.style.display = 'block';
-        if(fgCapacity) fgCapacity.style.display = 'block';
-        if(document.getElementById('f-capacity')) document.getElementById('f-capacity').required = true;
+    if (fDateLabel) fDateLabel.textContent = 'Data di uscita / Acquisto';
+    if (fgColorWrapper) fgColorWrapper.style.display = 'block';
+
+    if (activeCategory === 'Watch') {
+      if (fgGeneration) fgGeneration.style.display = 'block';
+      if (fgCapacity) fgCapacity.style.display = 'block';
+      if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = true;
     }
   }
 }
@@ -503,36 +503,36 @@ function goHome() {
   btnAdd.style.display = 'none';
   if (btnExport) btnExport.style.display = 'flex';
   if (btnImport) btnImport.style.display = 'flex';
-  
+
   renderCategories();
 }
 
 function renderProducts() {
-  if(!activeCategory) return;
-  
+  if (!activeCategory) return;
+
   const filtered = products.filter(p => p.macroCategory === activeCategory);
-  
+
   productGridEl.innerHTML = '';
-  
+
   if (filtered.length === 0) {
     productGridEl.style.display = 'none';
     emptyStateEl.style.display = 'flex';
     countEl.textContent = 'Nessun Dispositivo';
     return;
   }
-  
+
   productGridEl.style.display = 'grid';
   emptyStateEl.style.display = 'none';
   countEl.textContent = `${filtered.length} Dispositiv${filtered.length === 1 ? 'o' : 'i'}`;
-  
-  const sorted = [...filtered].sort((a,b) => new Date(b.releaseDate) - new Date(a.releaseDate));
-  
+
+  const sorted = [...filtered].sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+
   sorted.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product-card fade';
-    
+
     const imgUrl = product.image ? product.image : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23eeeeee" width="100" height="100"/><text x="50" y="55" font-size="30" font-family="sans-serif" fill="%23aaaaaa" text-anchor="middle"></text></svg>';
-    
+
     card.innerHTML = `
       <button class="btn-delete" title="Rimuovi" onclick="deleteProduct('${product.id}', event)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -601,9 +601,9 @@ function renderProducts() {
 }
 
 // ACTIONS
-window.deleteProduct = function(id, e) {
+window.deleteProduct = function (id, e) {
   e.stopPropagation();
-  if(confirm('Sei sicuro di voler rimuovere questo prodotto?')) {
+  if (confirm('Sei sicuro di voler rimuovere questo prodotto?')) {
     products = products.filter(p => p.id !== id);
     saveData();
     renderCategories(); // updates stats in background
@@ -611,60 +611,60 @@ window.deleteProduct = function(id, e) {
   }
 }
 
-window.editProduct = function(id, e) {
+window.editProduct = function (id, e) {
   e.stopPropagation();
   const prod = products.find(p => p.id === id);
-  if(!prod) return;
-  
+  if (!prod) return;
+
   editingId = id;
   document.querySelector('.modal-header h2').textContent = 'Modifica Dispositivo';
-  
+
   openCategory(prod.macroCategory);
-  
+
   setTimeout(() => {
     fFamily.value = prod.family || '';
     document.getElementById('f-model').value = prod.model || '';
-    
+
     const fModelName = document.getElementById('f-modelName');
-    if(fModelName) fModelName.value = prod.modelName || '';
-    
+    if (fModelName) fModelName.value = prod.modelName || '';
+
     const genList = GENERATIONS[prod.macroCategory] || GENERATIONS.default;
     if (prod.generation && !genList.includes(prod.generation)) {
-        if (!GENERATIONS[prod.macroCategory]) GENERATIONS[prod.macroCategory] = [...GENERATIONS.default];
-        GENERATIONS[prod.macroCategory].push(prod.generation);
-        localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
-        populateGenerations(prod.macroCategory);
+      if (!GENERATIONS[prod.macroCategory]) GENERATIONS[prod.macroCategory] = [...GENERATIONS.default];
+      GENERATIONS[prod.macroCategory].push(prod.generation);
+      localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
+      populateGenerations(prod.macroCategory);
     }
     const fGen = document.getElementById('f-generation');
-    if(fGen) fGen.value = prod.generation || '';
-    
+    if (fGen) fGen.value = prod.generation || '';
+
     const capList = CAPACITIES[prod.macroCategory] || CAPACITIES.default;
     if (prod.capacity && !capList.includes(prod.capacity.toLowerCase())) {
-        CAPACITIES[prod.macroCategory].push(prod.capacity.toLowerCase());
-        localStorage.setItem('apple-archive-capacities', JSON.stringify(CAPACITIES));
-        populateCapacities(prod.macroCategory);
+      CAPACITIES[prod.macroCategory].push(prod.capacity.toLowerCase());
+      localStorage.setItem('apple-archive-capacities', JSON.stringify(CAPACITIES));
+      populateCapacities(prod.macroCategory);
     }
     const fCap = document.getElementById('f-capacity');
-    if(fCap) fCap.value = prod.capacity ? prod.capacity.toLowerCase() : '';
-    
+    if (fCap) fCap.value = prod.capacity ? prod.capacity.toLowerCase() : '';
+
     const fCel = document.getElementById('f-cellular');
-    if(fCel) fCel.value = prod.cellular || 'No';
-    
+    if (fCel) fCel.value = prod.cellular || 'No';
+
     document.getElementById('f-color').value = prod.color || '#0071e3';
     document.getElementById('f-date').value = prod.releaseDate || '';
     document.getElementById('f-image').value = prod.image || '';
-    
+
     const fSeason = document.getElementById('f-season');
-    if(fSeason) fSeason.value = prod.season || '';
+    if (fSeason) fSeason.value = prod.season || '';
     const fCompatibility = document.getElementById('f-compatibility');
-    if(fCompatibility) fCompatibility.value = prod.compatibility || '';
+    if (fCompatibility) fCompatibility.value = prod.compatibility || '';
     const fStrapStyle = document.getElementById('f-strapStyle');
-    if(fStrapStyle) fStrapStyle.value = prod.strapStyle || '';
+    if (fStrapStyle) fStrapStyle.value = prod.strapStyle || '';
     const fMaterial = document.getElementById('f-material');
-    if(fMaterial) fMaterial.value = prod.material || '';
-    
+    if (fMaterial) fMaterial.value = prod.material || '';
+
     applyFamilyLogic(prod.family);
-    
+
     openModal();
   }, 10);
 };
@@ -672,7 +672,7 @@ window.editProduct = function(id, e) {
 // MODAL LOGIC
 function openModal() {
   modalOverlay.classList.add('active');
-  document.body.style.overflow = 'hidden'; 
+  document.body.style.overflow = 'hidden';
 }
 function closeModal() {
   modalOverlay.classList.remove('active');
@@ -692,25 +692,25 @@ modalOverlay.addEventListener('click', (e) => {
 
 // NEW GENERATION LOGIC
 const fGenerationListener = document.getElementById('f-generation');
-if(fGenerationListener) {
-    fGenerationListener.addEventListener('change', (e) => {
-      if(btnRemoveGeneration) btnRemoveGeneration.disabled = (!e.target.value || e.target.value === '_new_');
-      if (e.target.value === '_new_') {
-        const newGen = prompt('Inserisci la nuova generazione (es. "11ª Generazione"):');
-        if (newGen && newGen.trim() !== '') {
-          const formatted = newGen.trim();
-          if (!GENERATIONS[activeCategory]) GENERATIONS[activeCategory] = [...GENERATIONS.default];
-          if (!GENERATIONS[activeCategory].includes(formatted)) {
-            GENERATIONS[activeCategory].push(formatted);
-            localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
-          }
-          populateGenerations(activeCategory);
-          fGenerationListener.value = formatted;
-        } else {
-          fGenerationListener.value = '';
+if (fGenerationListener) {
+  fGenerationListener.addEventListener('change', (e) => {
+    if (btnRemoveGeneration) btnRemoveGeneration.disabled = (!e.target.value || e.target.value === '_new_');
+    if (e.target.value === '_new_') {
+      const newGen = prompt('Inserisci la nuova generazione (es. "11ª Generazione"):');
+      if (newGen && newGen.trim() !== '') {
+        const formatted = newGen.trim();
+        if (!GENERATIONS[activeCategory]) GENERATIONS[activeCategory] = [...GENERATIONS.default];
+        if (!GENERATIONS[activeCategory].includes(formatted)) {
+          GENERATIONS[activeCategory].push(formatted);
+          localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
         }
+        populateGenerations(activeCategory);
+        fGenerationListener.value = formatted;
+      } else {
+        fGenerationListener.value = '';
       }
-    });
+    }
+  });
 }
 
 // NEW CAPACITY LOGIC
@@ -738,9 +738,9 @@ fCapacityListener.addEventListener('change', (e) => {
 
 // NEW MATERIAL LOGIC
 const fMaterialListener = document.getElementById('f-material');
-if(fMaterialListener) {
+if (fMaterialListener) {
   fMaterialListener.addEventListener('change', (e) => {
-    if(btnRemoveMaterial) btnRemoveMaterial.disabled = (!e.target.value || e.target.value === '_new_');
+    if (btnRemoveMaterial) btnRemoveMaterial.disabled = (!e.target.value || e.target.value === '_new_');
     if (e.target.value === '_new_') {
       const newVal = prompt('Inserisci il nuovo materiale:');
       if (newVal && newVal.trim() !== '') {
@@ -761,9 +761,9 @@ if(fMaterialListener) {
 
 // NEW COMPATIBILITY LOGIC
 const fCompatibilityListener = document.getElementById('f-compatibility');
-if(fCompatibilityListener) {
+if (fCompatibilityListener) {
   fCompatibilityListener.addEventListener('change', (e) => {
-    if(btnRemoveCompatibility) btnRemoveCompatibility.disabled = (!e.target.value || e.target.value === '_new_');
+    if (btnRemoveCompatibility) btnRemoveCompatibility.disabled = (!e.target.value || e.target.value === '_new_');
     if (e.target.value === '_new_') {
       const newVal = prompt('Inserisci la nuova compatibilità (es. "41"):');
       if (newVal && newVal.trim() !== '') {
@@ -784,9 +784,9 @@ if(fCompatibilityListener) {
 
 // NEW STRAP STYLE LOGIC
 const fStrapStyleListener = document.getElementById('f-strapStyle');
-if(fStrapStyleListener) {
+if (fStrapStyleListener) {
   fStrapStyleListener.addEventListener('change', (e) => {
-    if(btnRemoveStrapStyle) btnRemoveStrapStyle.disabled = (!e.target.value || e.target.value === '_new_');
+    if (btnRemoveStrapStyle) btnRemoveStrapStyle.disabled = (!e.target.value || e.target.value === '_new_');
     if (e.target.value === '_new_') {
       const newVal = prompt('Inserisci il nuovo stile cinturino:');
       if (newVal && newVal.trim() !== '') {
@@ -832,193 +832,193 @@ fFamily.addEventListener('change', (e) => {
 
 // IMPORT/EXPORT LOGIC
 if (btnExport) {
-    btnExport.addEventListener('click', () => {
-        const dataToExport = {
-            'apple-archive-data': JSON.parse(localStorage.getItem('apple-archive-data')) || [],
-            'apple-archive-categories': JSON.parse(localStorage.getItem('apple-archive-categories')),
-            'apple-archive-capacities': JSON.parse(localStorage.getItem('apple-archive-capacities')),
-            'apple-archive-generations': JSON.parse(localStorage.getItem('apple-archive-generations')),
-            'apple-archive-materials': JSON.parse(localStorage.getItem('apple-archive-materials')),
-            'apple-archive-compatibilities': JSON.parse(localStorage.getItem('apple-archive-compatibilities')),
-            'apple-archive-strap-styles': JSON.parse(localStorage.getItem('apple-archive-strap-styles')),
-            'apple-archive-accessory-types': JSON.parse(localStorage.getItem('apple-archive-accessory-types'))
-        };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "apple-archive-backup.json");
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    });
+  btnExport.addEventListener('click', () => {
+    const dataToExport = {
+      'apple-archive-data': JSON.parse(localStorage.getItem('apple-archive-data')) || [],
+      'apple-archive-categories': JSON.parse(localStorage.getItem('apple-archive-categories')),
+      'apple-archive-capacities': JSON.parse(localStorage.getItem('apple-archive-capacities')),
+      'apple-archive-generations': JSON.parse(localStorage.getItem('apple-archive-generations')),
+      'apple-archive-materials': JSON.parse(localStorage.getItem('apple-archive-materials')),
+      'apple-archive-compatibilities': JSON.parse(localStorage.getItem('apple-archive-compatibilities')),
+      'apple-archive-strap-styles': JSON.parse(localStorage.getItem('apple-archive-strap-styles')),
+      'apple-archive-accessory-types': JSON.parse(localStorage.getItem('apple-archive-accessory-types'))
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "apple-archive-backup.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  });
 }
 
 if (btnImport && importFile) {
-    btnImport.addEventListener('click', () => {
-        importFile.click();
-    });
+  btnImport.addEventListener('click', () => {
+    importFile.click();
+  });
 
-    importFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+  importFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                const importedData = JSON.parse(event.target.result);
-                // Controllo minimo di validità
-                if (importedData['apple-archive-data']) {
-                    const keysToImport = [
-                        'apple-archive-data',
-                        'apple-archive-categories',
-                        'apple-archive-capacities',
-                        'apple-archive-generations',
-                        'apple-archive-materials',
-                        'apple-archive-compatibilities',
-                        'apple-archive-strap-styles',
-                        'apple-archive-accessory-types'
-                    ];
-                    
-                    if (confirm('Sei sicuro di voler importare questi dati? I dati attuali verranno sovrascritti permanentemente.')) {
-                        keysToImport.forEach(key => {
-                            if (importedData[key]) {
-                                localStorage.setItem(key, JSON.stringify(importedData[key]));
-                            }
-                        });
-                        alert('Dati importati con successo! La pagina verrà ricaricata.');
-                        location.reload();
-                    }
-                } else {
-                    alert('Il file selezionato non è un backup valido.');
-                }
-            } catch (err) {
-                alert('Errore durante la lettura del file. Assicurati che sia un JSON valido.');
-                console.error(err);
-            }
-        };
-        reader.readAsText(file);
-        
-        e.target.value = '';
-    });
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      try {
+        const importedData = JSON.parse(event.target.result);
+        // Controllo minimo di validità
+        if (importedData['apple-archive-data']) {
+          const keysToImport = [
+            'apple-archive-data',
+            'apple-archive-categories',
+            'apple-archive-capacities',
+            'apple-archive-generations',
+            'apple-archive-materials',
+            'apple-archive-compatibilities',
+            'apple-archive-strap-styles',
+            'apple-archive-accessory-types'
+          ];
+
+          if (confirm('Sei sicuro di voler importare questi dati? I dati attuali verranno sovrascritti permanentemente.')) {
+            keysToImport.forEach(key => {
+              if (importedData[key]) {
+                localStorage.setItem(key, JSON.stringify(importedData[key]));
+              }
+            });
+            alert('Dati importati con successo! La pagina verrà ricaricata.');
+            location.reload();
+          }
+        } else {
+          alert('Il file selezionato non è un backup valido.');
+        }
+      } catch (err) {
+        alert('Errore durante la lettura del file. Assicurati che sia un JSON valido.');
+        console.error(err);
+      }
+    };
+    reader.readAsText(file);
+
+    e.target.value = '';
+  });
 }
 
 
 
 // REMOVAL LOGIC
 btnRemoveFamily.addEventListener('click', () => {
-    const val = fFamily.value;
-    if (!val || val === '_new_') return;
-    if (confirm(`Sei sicuro di voler rimuovere il modello "${val}" dall'elenco?`)) {
-        const catObj = MACRO_CATEGORIES.find(c => c.id === activeCategory);
-        if (catObj && catObj.sub.includes(val)) {
-            catObj.sub = catObj.sub.filter(s => s !== val);
-            localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
-            populateFamilies(activeCategory);
-            fFamily.value = '';
-            btnRemoveFamily.disabled = true;
-        }
+  const val = fFamily.value;
+  if (!val || val === '_new_') return;
+  if (confirm(`Sei sicuro di voler rimuovere il modello "${val}" dall'elenco?`)) {
+    const catObj = MACRO_CATEGORIES.find(c => c.id === activeCategory);
+    if (catObj && catObj.sub.includes(val)) {
+      catObj.sub = catObj.sub.filter(s => s !== val);
+      localStorage.setItem('apple-archive-categories', JSON.stringify(MACRO_CATEGORIES));
+      populateFamilies(activeCategory);
+      fFamily.value = '';
+      btnRemoveFamily.disabled = true;
     }
+  }
 });
 
 btnRemoveGeneration.addEventListener('click', () => {
-    const fGen = document.getElementById('f-generation');
-    if(!fGen) return;
-    const val = fGen.value;
-    if (!val || val === '_new_') return;
-    if (confirm(`Sei sicuro di voler rimuovere la "${val}" dall'elenco?`)) {
-        if (GENERATIONS[activeCategory] && GENERATIONS[activeCategory].includes(val)) {
-            GENERATIONS[activeCategory] = GENERATIONS[activeCategory].filter(s => s !== val);
-            localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
-            populateGenerations(activeCategory);
-            fGen.value = '';
-            if(btnRemoveGeneration) btnRemoveGeneration.disabled = true;
-        }
+  const fGen = document.getElementById('f-generation');
+  if (!fGen) return;
+  const val = fGen.value;
+  if (!val || val === '_new_') return;
+  if (confirm(`Sei sicuro di voler rimuovere la "${val}" dall'elenco?`)) {
+    if (GENERATIONS[activeCategory] && GENERATIONS[activeCategory].includes(val)) {
+      GENERATIONS[activeCategory] = GENERATIONS[activeCategory].filter(s => s !== val);
+      localStorage.setItem('apple-archive-generations', JSON.stringify(GENERATIONS));
+      populateGenerations(activeCategory);
+      fGen.value = '';
+      if (btnRemoveGeneration) btnRemoveGeneration.disabled = true;
     }
+  }
 });
 
 btnRemoveCapacity.addEventListener('click', () => {
-    const val = fCapacityListener.value;
-    if (!val || val === '_new_') return;
-    if (confirm(`Sei sicuro di voler rimuovere il taglio "${val.toUpperCase()}" dall'elenco?`)) {
-        if (CAPACITIES[activeCategory] && CAPACITIES[activeCategory].includes(val)) {
-            CAPACITIES[activeCategory] = CAPACITIES[activeCategory].filter(s => s !== val);
-            localStorage.setItem('apple-archive-capacities', JSON.stringify(CAPACITIES));
-            populateCapacities(activeCategory);
-            fCapacityListener.value = '';
-            btnRemoveCapacity.disabled = true;
-        }
+  const val = fCapacityListener.value;
+  if (!val || val === '_new_') return;
+  if (confirm(`Sei sicuro di voler rimuovere il taglio "${val.toUpperCase()}" dall'elenco?`)) {
+    if (CAPACITIES[activeCategory] && CAPACITIES[activeCategory].includes(val)) {
+      CAPACITIES[activeCategory] = CAPACITIES[activeCategory].filter(s => s !== val);
+      localStorage.setItem('apple-archive-capacities', JSON.stringify(CAPACITIES));
+      populateCapacities(activeCategory);
+      fCapacityListener.value = '';
+      btnRemoveCapacity.disabled = true;
     }
+  }
 });
 
-if(btnRemoveMaterial) {
+if (btnRemoveMaterial) {
   btnRemoveMaterial.addEventListener('click', () => {
-      const val = fMaterialListener.value;
-      if (!val || val === '_new_') return;
-      if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
-          if (MATERIALS[activeCategory] && MATERIALS[activeCategory].includes(val)) {
-              MATERIALS[activeCategory] = MATERIALS[activeCategory].filter(s => s !== val);
-              localStorage.setItem('apple-archive-materials', JSON.stringify(MATERIALS));
-              populateMaterials(activeCategory);
-              fMaterialListener.value = '';
-              btnRemoveMaterial.disabled = true;
-          }
+    const val = fMaterialListener.value;
+    if (!val || val === '_new_') return;
+    if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
+      if (MATERIALS[activeCategory] && MATERIALS[activeCategory].includes(val)) {
+        MATERIALS[activeCategory] = MATERIALS[activeCategory].filter(s => s !== val);
+        localStorage.setItem('apple-archive-materials', JSON.stringify(MATERIALS));
+        populateMaterials(activeCategory);
+        fMaterialListener.value = '';
+        btnRemoveMaterial.disabled = true;
       }
+    }
   });
 }
 
-if(btnRemoveCompatibility) {
+if (btnRemoveCompatibility) {
   btnRemoveCompatibility.addEventListener('click', () => {
-      const val = fCompatibilityListener.value;
-      if (!val || val === '_new_') return;
-      if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
-          if (COMPATIBILITIES[activeCategory] && COMPATIBILITIES[activeCategory].includes(val)) {
-              COMPATIBILITIES[activeCategory] = COMPATIBILITIES[activeCategory].filter(s => s !== val);
-              localStorage.setItem('apple-archive-compatibilities', JSON.stringify(COMPATIBILITIES));
-              populateCompatibilities(activeCategory);
-              fCompatibilityListener.value = '';
-              btnRemoveCompatibility.disabled = true;
-          }
+    const val = fCompatibilityListener.value;
+    if (!val || val === '_new_') return;
+    if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
+      if (COMPATIBILITIES[activeCategory] && COMPATIBILITIES[activeCategory].includes(val)) {
+        COMPATIBILITIES[activeCategory] = COMPATIBILITIES[activeCategory].filter(s => s !== val);
+        localStorage.setItem('apple-archive-compatibilities', JSON.stringify(COMPATIBILITIES));
+        populateCompatibilities(activeCategory);
+        fCompatibilityListener.value = '';
+        btnRemoveCompatibility.disabled = true;
       }
+    }
   });
 }
 
-if(btnRemoveStrapStyle) {
+if (btnRemoveStrapStyle) {
   btnRemoveStrapStyle.addEventListener('click', () => {
-      const val = fStrapStyleListener.value;
-      if (!val || val === '_new_') return;
-      if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
-          if (STRAP_STYLES[activeCategory] && STRAP_STYLES[activeCategory].includes(val)) {
-              STRAP_STYLES[activeCategory] = STRAP_STYLES[activeCategory].filter(s => s !== val);
-              localStorage.setItem('apple-archive-strap-styles', JSON.stringify(STRAP_STYLES));
-              populateStrapStyles(activeCategory);
-              fStrapStyleListener.value = '';
-              btnRemoveStrapStyle.disabled = true;
-          }
+    const val = fStrapStyleListener.value;
+    if (!val || val === '_new_') return;
+    if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco?`)) {
+      if (STRAP_STYLES[activeCategory] && STRAP_STYLES[activeCategory].includes(val)) {
+        STRAP_STYLES[activeCategory] = STRAP_STYLES[activeCategory].filter(s => s !== val);
+        localStorage.setItem('apple-archive-strap-styles', JSON.stringify(STRAP_STYLES));
+        populateStrapStyles(activeCategory);
+        fStrapStyleListener.value = '';
+        btnRemoveStrapStyle.disabled = true;
       }
+    }
   });
 }
 
-if(btnRemoveAccessoryType) {
+if (btnRemoveAccessoryType) {
   btnRemoveAccessoryType.addEventListener('click', () => {
-      const val = fAccessoryTypeListener.value;
-      if (!val || val === '_new_') return;
-      if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco per questo prodotto?`)) {
-          const currentFamily = document.getElementById('f-family').value;
-          if (ACCESSORY_TYPES[currentFamily] && ACCESSORY_TYPES[currentFamily].includes(val)) {
-              ACCESSORY_TYPES[currentFamily] = ACCESSORY_TYPES[currentFamily].filter(s => s !== val);
-              localStorage.setItem('apple-archive-accessory-types', JSON.stringify(ACCESSORY_TYPES));
-              populateAccessoryTypes(currentFamily);
-              fAccessoryTypeListener.value = '';
-              btnRemoveAccessoryType.disabled = true;
-          }
+    const val = fAccessoryTypeListener.value;
+    if (!val || val === '_new_') return;
+    if (confirm(`Sei sicuro di voler rimuovere "${val}" dall'elenco per questo prodotto?`)) {
+      const currentFamily = document.getElementById('f-family').value;
+      if (ACCESSORY_TYPES[currentFamily] && ACCESSORY_TYPES[currentFamily].includes(val)) {
+        ACCESSORY_TYPES[currentFamily] = ACCESSORY_TYPES[currentFamily].filter(s => s !== val);
+        localStorage.setItem('apple-archive-accessory-types', JSON.stringify(ACCESSORY_TYPES));
+        populateAccessoryTypes(currentFamily);
+        fAccessoryTypeListener.value = '';
+        btnRemoveAccessoryType.disabled = true;
       }
+    }
   });
 }
 
 // FORM SUBMIT
 addForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  
+
   const fMacro = document.getElementById('f-macroCategory').value;
   const fFam = document.getElementById('f-family').value.trim();
 
@@ -1039,10 +1039,10 @@ addForm.addEventListener('submit', (e) => {
     material: document.getElementById('f-material') ? document.getElementById('f-material').value : '',
     accessoryType: document.getElementById('f-accessoryType') ? document.getElementById('f-accessoryType').value : ''
   };
-  
+
   if (editingId) {
     const pIndex = products.findIndex(p => p.id === editingId);
-    if(pIndex > -1) {
+    if (pIndex > -1) {
       products[pIndex] = { ...products[pIndex], ...productData };
     }
   } else {
