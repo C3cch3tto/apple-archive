@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title> Apple Archive</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Gestisci e archivia la tua collezione di prodotti Apple">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Apple Archive">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/ios/200/mac-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button id="btn-back" class="btn-back" style="display: none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="header-titles">
+                   <h1 id="page-title">Apple Archive</h1>
+                   <p class="subtitle" id="collection-count">Banca Dati Dispositivi Apple</p>
+                </div>
+            </div>
+            <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
+                <button id="btn-export" class="btn-action-icon" title="Esporta Dati">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </button>
+                <button id="btn-import" class="btn-action-icon" title="Importa Dati">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+                <button id="btn-add-product" class="btn-primary" style="display: none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Home: Categories Grid -->
+            <div class="category-grid" id="category-grid">
+               <!-- Auto-injected by JS -->
+            </div>
+
+            <!-- Category: Products Grid -->
+            <div class="product-grid fade" id="product-grid" style="display: none;">
+                <!-- Products will be injected here via JS -->
+            </div>
+            
+            <!-- Empty State -->
+            <div class="empty-state fade" id="empty-state" style="display: none;">
+                <div class="empty-icon"></div>
+                <h2>Collezione Vuota</h2>
+                <p>Nessun dispositivo registrato in questa categoria.</p>
+                <button id="btn-empty-add" class="btn-secondary">Aggiungi Dispositivo</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Product Modal Overlay -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuovo Dispositivo</h2>
+                <button class="btn-close" id="btn-close-modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="add-product-form">
+                    <!-- Automatically filled by JS depending on the active category -->
+                    <input type="hidden" id="f-macroCategory" value="">
+                    
+                    <div class="form-group">
+                        <label for="f-family">Sottocategoria / Famiglia (es. iPod Nano, MacBook Pro)</label>
+                        <div class="input-with-action">
+                            <select id="f-family" required>
+                                <!-- Injected dynamically by JS -->
+                            </select>
+                            <button type="button" class="btn-remove-option" id="btn-remove-family" title="Rimuovi modello selezionato" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="container-accessoryType" style="display: none;">
+                        <label for="f-accessoryType">Tipologia Accessorio</label>
+                        <div class="input-with-action">
+                            <select id="f-accessoryType">
+                                <!-- Injected dynamically by JS -->
+                            </select>
+                            <button type="button" class="btn-remove-option" id="btn-remove-accessoryType" title="Rimuovi accessorio selezionato" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="container-model">
+                            <label for="f-model">N. Modello (es. A1199)</label>
+                            <input type="text" id="f-model" placeholder="es. A2377" autocomplete="off">
+                        </div>
+                        <div class="form-group" id="container-modelName">
+                            <label for="f-modelName">Nome Modello</label>
+                            <input type="text" id="f-modelName" placeholder="es. iPad Pro M4" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="container-generation">
+                        <label for="f-generation">Generazione (Opzionale)</label>
+                        <div class="input-with-action">
+                            <select id="f-generation">
+                                <!-- Injected dynamically by JS -->
+                            </select>
+                            <button type="button" class="btn-remove-option" id="btn-remove-generation" title="Rimuovi generazione" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="container-capacity">
+                            <label for="f-capacity">Capacità / Memoria</label>
+                            <div class="input-with-action">
+                                <select id="f-capacity" required>
+                                    <!-- Injected dynamically by JS -->
+                                </select>
+                                <button type="button" class="btn-remove-option" id="btn-remove-capacity" title="Rimuovi taglio selezionato" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-color">Colore Dominante</label>
+                            <div class="color-picker-wrap">
+                                <input type="color" id="f-color" value="#0071e3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="container-cellular" style="display: none;">
+                            <label for="f-cellular">Modulo Cellulare</label>
+                            <select id="f-cellular">
+                                <option value="No">Solo Wi-Fi</option>
+                                <option value="Sì">Wi-Fi + Cellular</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="l-date" for="f-date">Data di uscita / Acquisto</label>
+                            <input type="date" id="f-date">
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="container-cinturini-1" style="display: none;">
+                        <div class="form-group" id="container-season">
+                            <label for="f-season">Stagione</label>
+                            <select id="f-season">
+                                <option value="" disabled selected>Seleziona...</option>
+                                <option value="Primavera">Primavera</option>
+                                <option value="Estate">Estate</option>
+                                <option value="Autunno">Autunno</option>
+                                <option value="Inverno">Inverno</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="container-compatibility">
+                            <label for="f-compatibility">Compatibilità (mm)</label>
+                            <div class="input-with-action">
+                                <select id="f-compatibility">
+                                    <!-- Dynamic -->
+                                </select>
+                                <button type="button" class="btn-remove-option" id="btn-remove-compatibility" title="Rimuovi compatibilità" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="container-cinturini-2" style="display: none;">
+                        <div class="form-group" id="container-strapStyle">
+                            <label for="f-strapStyle">Stile Cinturino</label>
+                            <div class="input-with-action">
+                                <select id="f-strapStyle">
+                                    <!-- Dynamic -->
+                                </select>
+                                <button type="button" class="btn-remove-option" id="btn-remove-strapStyle" title="Rimuovi stile cinturino" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group" id="container-material">
+                            <label for="f-material">Materiale</label>
+                            <div class="input-with-action">
+                                <select id="f-material">
+                                   <!-- Dynamic -->
+                                </select>
+                                <button type="button" class="btn-remove-option" id="btn-remove-material" title="Rimuovi materiale" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="f-image">URL Immagine (Opzionale)</label>
+                        <input type="url" id="f-image" placeholder="https://..." autocomplete="off">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary btn-block">Salva nel Database</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
