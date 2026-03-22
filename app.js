@@ -229,11 +229,17 @@ function openCategory(catId) {
   if (fgCapacity) fgCapacity.style.display = 'block';
   if (fCapacity) fCapacity.required = true;
 
-  if (catId === 'iPod' || catId === 'TV' || catId === 'Watch') {
+  if (catId === 'iPod' || catId === 'TV') {
     fgGeneration.style.display = 'block';
     fgModelName.style.display = 'none';
     fModelName.value = '';
     if (fgCellular) fgCellular.style.display = 'none';
+    if (fCellular) fCellular.value = 'No';
+  } else if (catId === 'Watch') {
+    fgGeneration.style.display = 'block';
+    fgModelName.style.display = 'none';
+    fModelName.value = '';
+    if (fgCellular) fgCellular.style.display = 'block';
     if (fCellular) fCellular.value = 'No';
   } else if (catId === 'iPad') {
     fgGeneration.style.display = 'none';
@@ -487,6 +493,7 @@ function applyFamilyLogic(family) {
     if (activeCategory === 'Watch') {
       if (fgGeneration) fgGeneration.style.display = 'block';
       if (fgCapacity) fgCapacity.style.display = 'block';
+      if (fgCellular) fgCellular.style.display = 'block';
       if (document.getElementById('f-capacity')) document.getElementById('f-capacity').required = true;
     }
   }
@@ -555,9 +562,9 @@ function renderProducts() {
                   <span class="spec-label">Nome Modello</span>
                   <span class="spec-value">${product.modelName}</span>
               </div>
-              <div class="spec-item" style="${product.cellular === 'Sì' || product.macroCategory === 'iPad' ? '' : 'display: none;'}">
+              <div class="spec-item" style="${product.cellular === 'Sì' || product.macroCategory === 'iPad' || product.macroCategory === 'Watch' ? '' : 'display: none;'}">
                   <span class="spec-label">Connettività</span>
-                  <span class="spec-value">${product.cellular === 'Sì' ? 'Wi-Fi + Cellular' : 'Solo Wi-Fi'}</span>
+                  <span class="spec-value">${product.cellular === 'Sì' ? (product.macroCategory === 'Watch' ? 'GPS + Cellular' : 'Wi-Fi + Cellular') : (product.macroCategory === 'Watch' ? 'Solo GPS' : 'Solo Wi-Fi')}</span>
               </div>
               <div class="spec-item" style="${product.generation || ['iPod', 'TV', 'AirPods', 'Watch'].includes(product.macroCategory) ? '' : 'display: none;'}">
                   <span class="spec-label">Generazione</span>
