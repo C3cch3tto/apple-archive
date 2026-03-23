@@ -692,7 +692,19 @@ window.editProduct = function (id, e) {
 
     document.getElementById('f-color').value = prod.color || '#0071e3';
     document.getElementById('f-date').value = prod.releaseDate || '';
-    document.getElementById('f-image').value = prod.image || '';
+    document.getElementById('f-image').value = '';
+    uploadedImageData = '';
+    if (prod.image) {
+      if (prod.image.startsWith('data:')) {
+        uploadedImageData = prod.image;
+        showImagePreview(prod.image);
+      } else {
+        document.getElementById('f-image').value = prod.image;
+        showImagePreview(prod.image);
+      }
+    } else {
+      clearImagePreview();
+    }
 
     const fSeason = document.getElementById('f-season');
     if (fSeason) fSeason.value = prod.season || '';
@@ -722,6 +734,7 @@ function closeModal() {
   addForm.reset();
   editingId = null;
   document.querySelector('.modal-header h2').textContent = 'Nuovo Dispositivo';
+  clearImagePreview();
 }
 
 btnBack.addEventListener('click', goHome);
@@ -1096,6 +1109,95 @@ if (btnRemoveAccessoryType) {
   });
 }
 
+// IMAGE UPLOAD LOGIC
+let uploadedImageData = ''; // holds base64 data from file upload
+
+const imageUploadArea = document.getElementById('image-upload-area');
+const imageFileInput = document.getElementById('f-image-file');
+const imagePreview = document.getElementById('image-preview');
+const imageUploadPlaceholder = document.getElementById('image-upload-placeholder');
+const btnClearImage = document.getElementById('btn-clear-image');
+const fImageUrl = document.getElementById('f-image');
+
+function showImagePreview(src) {
+  if (imagePreview) {
+    imagePreview.src = src;
+    imagePreview.style.display = 'block';
+  }
+  if (imageUploadPlaceholder) imageUploadPlaceholder.style.display = 'none';
+  if (imageUploadArea) imageUploadArea.classList.add('has-image');
+  if (btnClearImage) btnClearImage.style.display = 'flex';
+}
+
+function clearImagePreview() {
+  uploadedImageData = '';
+  if (imagePreview) {
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+  }
+  if (imageUploadPlaceholder) imageUploadPlaceholder.style.display = 'flex';
+  if (imageUploadArea) imageUploadArea.classList.remove('has-image');
+  if (btnClearImage) btnClearImage.style.display = 'none';
+  if (fImageUrl) fImageUrl.value = '';
+  if (imageFileInput) imageFileInput.value = '';
+}
+
+function resizeAndConvert(file, maxSize, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
+      else { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/webp', 0.8));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+if (imageUploadArea) {
+  imageUploadArea.addEventListener('click', () => {
+    if (imageFileInput) imageFileInput.click();
+  });
+}
+
+if (imageFileInput) {
+  imageFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    resizeAndConvert(file, 400, (base64) => {
+      uploadedImageData = base64;
+      showImagePreview(base64);
+      if (fImageUrl) fImageUrl.value = '';
+    });
+  });
+}
+
+if (fImageUrl) {
+  fImageUrl.addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      uploadedImageData = '';
+      showImagePreview(url);
+    } else if (!uploadedImageData) {
+      clearImagePreview();
+    }
+  });
+}
+
+if (btnClearImage) {
+  btnClearImage.addEventListener('click', (e) => {
+    e.preventDefault();
+    clearImagePreview();
+  });
+}
+
 // FORM SUBMIT
 addForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1113,7 +1215,7 @@ addForm.addEventListener('submit', (e) => {
     capacity: document.getElementById('f-capacity') ? document.getElementById('f-capacity').value : '',
     color: document.getElementById('f-color') ? document.getElementById('f-color').value : '',
     releaseDate: document.getElementById('f-date').value,
-    image: document.getElementById('f-image').value,
+    image: uploadedImageData || document.getElementById('f-image').value,
     season: document.getElementById('f-season') ? document.getElementById('f-season').value : '',
     compatibility: document.getElementById('f-compatibility') ? document.getElementById('f-compatibility').value : '',
     strapStyle: document.getElementById('f-strapStyle') ? document.getElementById('f-strapStyle').value : '',
